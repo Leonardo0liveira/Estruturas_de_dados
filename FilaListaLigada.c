@@ -6,7 +6,7 @@
 
 /** Definição da estrutura para um nó da lista ligada */
 struct No {
-    char dado[100];
+    char dado[5];
     struct No *proximo;
 };
 /** Definição da estrutura para a fila com lista ligada */
@@ -41,18 +41,18 @@ void inserirElementoListaLigada(struct FilaListaLigada *fila, char dado[]) {
     struct No *temp = novoNo(dado);
     if (fila->tras == NULL) {
         fila->frente = fila->tras = temp;
-        printf("Elemento '%s' inserido na fila.\n", dado);
+        printf("Cliente '%s' inserido na fila.\n", dado);
         return;
     }
     fila->tras->proximo = temp;
     fila->tras = temp;
-    printf("Elemento '%s' inserido na fila.\n", dado);
+    printf("Cliente '%s' inserido na fila.\n", dado);
 }
 
 /** Função para remover um elemento da fila */
 void removerElementoListaLigada(struct FilaListaLigada *fila) {
     if (filaVaziaListaLigada(*fila)) {
-        printf("A fila está vazia. Nenhum elemento para remover.\n");
+        printf("A fila está vazia. Nenhum cliente para remover.\n");
         return;
     }
     struct No *temp = fila->frente;
@@ -60,18 +60,18 @@ void removerElementoListaLigada(struct FilaListaLigada *fila) {
     if (fila->frente == NULL) {
         fila->tras = NULL;
     }
-    printf("Elemento '%s' removido da fila.\n", temp->dado);
+    printf("Cliente '%s' removido da fila.\n", temp->dado);
     free(temp);
 }
 
 /** Função para exibir os elementos da fila */
 void exibirElementosListaLigada(struct FilaListaLigada fila) {
     if (filaVaziaListaLigada(fila)) {
-        printf("A fila está vazia. Nenhum elemento para exibir.\n");
+        printf("A fila está vazia. Nenhum cliente para exibir.\n");
         return;
     }
     struct No *temp = fila.frente;
-    printf("\nElementos na fila:\n");
+    printf("\nClientes na fila:\n");
     while (temp != NULL) {
         printf("%s\n", temp->dado);
         temp = temp->proximo;
@@ -85,15 +85,15 @@ void localizarElementoConsultaListaLigada(struct FilaListaLigada fila, char elem
         int posicao = 1;
         while (atual != NULL) {
             if (strcmp(atual->dado, elemento) == 0) {
-                printf("O elemento '%s' foi encontrado na fila na posição %d.\n", elemento, posicao);
+                printf("O cliente '%s' foi encontrado na fila na posicao %d.\n", elemento, posicao);
                 return;
             }
             atual = atual->proximo;
             posicao++;
         }
-        printf("O elemento '%s' não foi encontrado na fila.\n", elemento);
+        printf("O cliente '%s' não foi encontrado na fila.\n", elemento);
     } else {
-        printf("A fila está vazia. Nenhum elemento para consultar.\n");
+        printf("A fila está vazia. Nenhum cliente para consultar.\n");
     }
 }
 
@@ -103,23 +103,23 @@ void localizarElementoAlteracaoListaLigada(struct FilaListaLigada *fila, char el
         struct No *atual = fila->frente;
         while (atual != NULL) {
             if (strcmp(atual->dado, elemento) == 0) {
-                printf("Digite o novo valor para o elemento '%s': ", elemento);
+                printf("Digite o novo valor para o cliente '%s': ", elemento);
                 scanf(" %[^\n]", atual->dado); /* Lê o novo valor para o elemento */
-                printf("O elemento '%s' foi alterado para '%s'.\n", elemento, atual->dado);
+                printf("O cliente '%s' foi alterado para '%s'.\n", elemento, atual->dado);
                 return;
             }
             atual = atual->proximo;
         }
-        printf("O elemento '%s' não foi encontrado na fila. Nenhuma alteração feita.\n", elemento);
+        printf("O cliente '%s' não foi encontrado na fila. Nenhuma alteracao feita.\n", elemento);
     } else {
-        printf("A fila está vazia. Nenhum elemento para alterar.\n");
+        printf("A fila esta vazia. Nenhum cliente para alterar.\n");
     }
 }
 
 /** Função para buscar por elementos que coincidam com um certo padrão na fila */
 void buscarPorPadraoListaLigada(struct FilaListaLigada fila, char padrao[]) {
     if (!filaVaziaListaLigada(fila)) {
-        printf("\nElementos na fila que coincidem com o padrão '%s':\n", padrao);
+        printf("\nClientes na fila que coincidem com o padrao '%s':\n", padrao);
         struct No *atual = fila.frente;
         while (atual != NULL) {
             if (strstr(atual->dado, padrao) != NULL) {
@@ -128,7 +128,7 @@ void buscarPorPadraoListaLigada(struct FilaListaLigada fila, char padrao[]) {
             atual = atual->proximo;
         }
     } else {
-        printf("A fila está vazia. Nenhum elemento para buscar por padrão.\n");
+        printf("A fila esta vazia. Nenhum cliente para buscar por padrão.\n");
     }
 }
 
@@ -223,7 +223,7 @@ void copiarFilaListaLigada(struct FilaListaLigada fila, struct FilaListaLigada *
         inserirElementoListaLigada(copia, atual->dado);
         atual = atual->proximo;
     }
-    printf("Cópia da fila:\n");
+    printf("Cópia da fila de clientes:\n");
     exibirElementosListaLigada(*copia);
 }
 
@@ -235,14 +235,14 @@ void menu() {
     int opcao;
 
     while (1) {
-        printf("\nDigite 1 para inserir elemento na fila 1\n");
-        printf("Digite 2 para remover elemento da fila 1\n");
-        printf("Digite 3 para exibir elementos da fila 1\n");
-        printf("Digite 4 para localizar um elemento na fila 1 para consulta\n");
-        printf("Digite 5 para localizar um elemento na fila 1 para alteracao\n");
+        printf("\nDigite 1 para inserir cliente na fila 1\n");
+        printf("Digite 2 para remover cliente da fila 1\n");
+        printf("Digite 3 para exibir clientes da fila 1\n");
+        printf("Digite 4 para localizar um cliente na fila 1 para consulta\n");
+        printf("Digite 5 para localizar um cliente na fila 1 para alteracao\n");
         printf("Digite 6 para buscar por padrao na fila 1\n");
-        printf("Digite 7 para criar uma nova fila\n");
-        printf("Digite 8 para verificar se a fila está vazia\n");
+        printf("Digite 7 para criar uma nova fila de clientes\n");
+        printf("Digite 8 para verificar se a fila esta vazia\n");
         printf("Digite 9 para intercalar fila 1 e fila 2\n");
         printf("Digite 10 para concatenar fila 1 e fila 2\n");
         printf("Digite 11 para dividir a fila 1 em duas\n");
@@ -254,7 +254,7 @@ void menu() {
         switch (opcao) {
             case 1: {
                 char elemento[100];
-                printf("Digite o elemento a ser inserido na fila 1: ");
+                printf("Digite o cliente a ser inserido na fila 1: ");
                 scanf(" %[^\n]", elemento);
                 inserirElementoListaLigada(&fila1, elemento);
                 break;
@@ -267,14 +267,14 @@ void menu() {
                 break;
             case 4: {
                 char elemento[100];
-                printf("Digite o elemento que deseja localizar na fila 1: ");
+                printf("Digite o cliente que deseja localizar na fila 1: ");
                 scanf(" %[^\n]", elemento);
                 localizarElementoConsultaListaLigada(fila1, elemento);
                 break;
             }
             case 5: {
                 char elemento[100];
-                printf("Digite o elemento que deseja alterar na fila 1: ");
+                printf("Digite o cliente que deseja alterar na fila 1: ");
                 scanf(" %[^\n]", elemento);
                 localizarElementoAlteracaoListaLigada(&fila1, elemento);
                 break;
@@ -288,13 +288,13 @@ void menu() {
             }
             case 7:
                 fila1 = criarFilaListaLigada();
-                printf("Uma nova fila foi criada.\n");
+                printf("Uma nova fila de clientes foi criada.\n");
                 break;
             case 8:
                 if (filaVaziaListaLigada(fila1)) {
-                    printf("A fila 1 esta vazia.\n");
+                    printf("A fila de clientes 1 esta vazia.\n");
                 } else {
-                    printf("A fila 1 não esta vazia.\n");
+                    printf("A fila de clientes 1 nao esta vazia.\n");
                 }
                 break;
 
