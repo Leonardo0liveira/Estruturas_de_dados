@@ -36,7 +36,7 @@ void inserirElemento(struct Pilha *pilha, char elemento[]) {
         strcpy(pilha->elementos[pilha->topo], elemento); /** Insere o elemento no topo **/
         printf("Elemento '%s' inserido na pilha.\n", elemento);
     } else {
-        printf("A pilha está cheia. Elemento '%s' não foi inserido.\n", elemento);
+        printf("A pilha esta cheia. Elemento '%s' nao foi inserido.\n", elemento);
     }
 }
 
@@ -46,7 +46,7 @@ void removerElemento(struct Pilha *pilha) {
         printf("Elemento '%s' removido da pilha.\n", pilha->elementos[pilha->topo]); /** Remove o elemento do topo **/
         pilha->topo--; /** Atualiza o topo **/
     } else {
-        printf("A pilha está vazia. Nenhum elemento para remover.\n");
+        printf("A pilha esta vazia. Nenhum elemento para remover.\n");
     }
 }
 
@@ -59,7 +59,7 @@ void exibirElementos(struct Pilha pilha) {
             printf("%s\n", pilha.elementos[i]);
         }
     } else {
-        printf("A pilha está vazia. Nenhum elemento para exibir.\n");
+        printf("A pilha esta vazia. Nenhum elemento para exibir.\n");
     }
 }
 
@@ -129,22 +129,27 @@ void intercalarPilhas(struct Pilha pilha1, struct Pilha pilha2) {
     exibirElementos(resultado);
 }
 
-/** Função para concatenar duas pilhas **/
-void concatenarPilhas(struct Pilha *pilha1, struct Pilha pilha2) {
-    struct Pilha copiaPilha2 = criarPilha();
-    /** Copia os elementos da pilha2 para uma pilha temporária para manter a ordem correta **/
-    while (!pilhaVazia(pilha2)) {
-        inserirElemento(&copiaPilha2, pilha2.elementos[pilha2.topo]);
-        removerElemento(&pilha2);
-    }
-    /** Concatena a pilha1 com a pilha temporária que contém os elementos da pilha2 **/
-    while (!pilhaVazia(copiaPilha2)) {
-        inserirElemento(pilha1, copiaPilha2.elementos[copiaPilha2.topo]);
-        removerElemento(&copiaPilha2);
-    }
-    printf("Pilhas concatenadas:\n");
-    exibirElementos(*pilha1);
-}
+ /* void concatenarPilhas(struct Pilha *pilha1, struct Pilha pilha2) {
+  struct Pilha pilhaConcatenada = criarPilha();  Cria uma nova pilha para armazenar a pilha concatenada
+
+    Concatena os elementos da pilha1 e da pilha2 na pilhaConcatenada
+  while (!pilhaVazia(*pilha1)) {
+    inserirElemento(&pilhaConcatenada, (*pilha1).elementos[(*pilha1).topo]);
+    removerElemento(pilha1);
+  }
+
+  while (!pilhaVazia(pilha2)) {
+    inserirElemento(&pilhaConcatenada, pilha2.elementos[pilha2.topo]);
+    removerElemento(&pilha2);
+  }
+
+   A pilhaConcatenada agora contém a pilha concatenada
+  printf("Pilhas concatenadas:\n");
+  exibirElementos(pilhaConcatenada);
+
+   Retorna a pilha concatenada
+  return pilhaConcatenada;
+} */
 
 
 /* Função do menu principal */
@@ -159,12 +164,12 @@ void menu() {
         printf("Digite 3 para exibir elementos da pilha 1 \n");
         printf("Digite 4 para localizar um elemento na pilha 1 para consulta\n");
         printf("Digite 5 para localizar um elemento na pilha 1 para alteracao \n");
-        printf("Digite 6 para buscar por padrão na pilha 1 \n");
+        printf("Digite 6 para buscar por padrao na pilha 1 \n");
         printf("Digite 7 para criar uma nova pilha \n");
         printf("Digite 8 para verificar se a pilha 1 esta vazia \n");
         printf("Digite 9 para verificar se a pilha 1 esta cheia \n");
-        printf("Digite 10 para intercalar pilha 1 e pilha 2 \n");
-        printf("Digite 11 para concatenar pilha 1 e pilha 2 \n");
+         printf("Digite 10 para intercalar elementos da pilha \n");
+       /*printf("Digite 11 para concatenar pilha 1 e pilha 2 \n");*/
         printf("Digite 12 para sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
@@ -210,24 +215,24 @@ void menu() {
                 break;
             case 8:
                 if (pilhaVazia(pilha1)) {
-                    printf("A pilha 1 está vazia.\n");
+                    printf("A pilha 1 esta vazia.\n");
                 } else {
-                    printf("A pilha 1 não está vazia.\n");
+                    printf("A pilha 1 não esta vazia.\n");
                 }
                 break;
             case 9:
                 if (pilhaCheia(pilha1)) {
-                    printf("A pilha 1 está cheia.\n");
+                    printf("A pilha 1 esta cheia.\n");
                 } else {
-                    printf("A pilha 1 não está cheia.\n");
+                    printf("A pilha 1 não esta cheia.\n");
                 }
                 break;
             case 10:
                 intercalarPilhas(pilha1, pilha2);
                 break;
-            case 11:
+            /* case 11:
                 concatenarPilhas(&pilha1, pilha2);
-                break;
+                break; */
             case 12:
                 printf("Saindo...\n");
                 return;
