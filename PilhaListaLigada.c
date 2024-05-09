@@ -10,33 +10,21 @@ struct Livro {
     struct Livro *prox; // Ponteiro para o próximo livro
 };
 
-// Declaracao de variavel global para o início da lista de livros
+// Declaracao de variavel global para o topo da pilha de livros
 struct Livro *biblioteca = NULL;
-struct Livro *fila1 = NULL;
-struct Livro *fila2 = NULL; // Alterado de pilha para fila
+struct Livro *pilha1 = NULL;
+struct Livro *pilha2 = NULL; // Alterado de pilha
 
-// Função para inserir um novo livro na fila
-void inserirLivro(char titulo[], struct Livro **fila) {
+// Função para empilhar um novo livro na pilha
+void empilharLivro(char titulo[], struct Livro **pilha) {
     struct Livro *novo_livro = (struct Livro *)malloc(sizeof(struct Livro));
     strcpy(novo_livro->titulo, titulo); // Copia o título do livro
-    novo_livro->prox = NULL; // O próximo será NULL, pois está sendo inserido no final da fila
-
-    // Se a fila estiver vazia, o novo livro será o primeiro
-    if (*fila == NULL) {
-        *fila = novo_livro;
-    } else {
-        // Encontra o último livro na fila
-        struct Livro *temp = *fila;
-        while (temp->prox != NULL) {
-            temp = temp->prox;
-        }
-        // Adiciona o novo livro no final da fila
-        temp->prox = novo_livro;
-    }
+    novo_livro->prox = *pilha; // O próximo será o antigo topo da pilha
+    *pilha = novo_livro; // Atualiza o topo da pilha para o novo livro
 }
 
-// Função para adicionar livros na fila
-int inserirLivros(struct Livro **fila) {
+// Função para adicionar livros na pilha
+int inserirLivros(struct Livro **pilha) {
     char titulo[100];
     char continuar;
     int count = 0; // Contador para acompanhar o número de livros adicionados
@@ -45,18 +33,18 @@ int inserirLivros(struct Livro **fila) {
     do {
         // Verifica se atingiu o limite máximo de livros
         if (count == MAX_LIVROS) {
-            printf("A fila atingiu o limite máximo de livros.\n");
+            printf("A pilha atingiu o limite máximo de livros.\n");
             break;
         }
 
         printf("Digite o titulo do livro: ");
         scanf(" %[^\n]", titulo); // Lê o título do livro (pode conter espaços)
-        inserirLivro(titulo, fila);
+        empilharLivro(titulo, pilha);
         count++; // Incrementa o contador de livros adicionados
 
         // Se atingiu o limite máximo de livros, sai do loop
         if (count == MAX_LIVROS) {
-            printf("A fila atingiu o limite máximo de livros.\n");
+            printf("A pilha atingiu o limite máximo de livros.\n");
             break;
         }
 
@@ -67,14 +55,41 @@ int inserirLivros(struct Livro **fila) {
     return 1;
 }
 
-// Função para imprimir os livros da fila
-int imprimeFila(struct Livro *fila) {
-    // Percorrendo e imprimindo a fila de livros
-    struct Livro *temp = fila;
-    if (fila == NULL) {
-        printf("A fila de livros está vazia.\n");
+// Função para verificar se a pilha está vazia e imprimir uma mensagem
+int pilhaEstaVazia(struct Livro *pilha) {
+    if (pilha == NULL) {
+        printf("A pilha está vazia.\n");
+        return 1; // Retorna 1 se a pilha estiver vazia
+    }
+    return 0; // Retorna 0 se a pilha não estiver vazia
+}
+
+// Função para verificar se a pilha está cheia e imprimir uma mensagem
+int pilhaEstaCheia(struct Livro *pilha) {
+    int count = 0;
+    struct Livro *temp = pilha;
+
+    // Conta o número de elementos na pilha
+    while (temp != NULL) {
+        count++;
+        temp = temp->prox;
+    }
+
+    if (count >= MAX_LIVROS) {
+        printf("A pilha está cheia.\n");
+        return 1; // Retorna 1 se a pilha estiver cheia
+    }
+    return 0; // Retorna 0 se a pilha não estiver cheia
+}
+
+// Função para imprimir os livros da pilha
+int imprimePilha(struct Livro *pilha) {
+    // Percorrendo e imprimindo a pilha de livros
+    struct Livro *temp = pilha;
+    if (pilha == NULL) {
+        printf("A pilha de livros está vazia.\n");
     } else {
-        printf("\nLivros na fila:\n");
+        printf("\nLivros na pilha:\n");
         while (temp != NULL) {
             printf("Titulo: %s\n", temp->titulo);
             temp = temp->prox;
@@ -84,12 +99,12 @@ int imprimeFila(struct Livro *fila) {
     return 0;
 }
 
-// Função para buscar por elementos que coincidam com um certo padrão na fila
-int buscarPorPadrao(char padrao[], struct Livro *fila) {
-    struct Livro *temp = fila;
+// Função para buscar por elementos que coincidam com um certo padrão na pilha
+int buscarPorPadrao(char padrao[], struct Livro *pilha) {
+    struct Livro *temp = pilha;
     int encontrados = 0;
 
-    // Percorre a fila de livros
+    // Percorre a pilha de livros
     while (temp != NULL) {
         // Verifica se o título do livro contém o padrão especificado
         if (strstr(temp->titulo, padrao) != NULL) {
@@ -107,39 +122,26 @@ int buscarPorPadrao(char padrao[], struct Livro *fila) {
     return encontrados; // Retorna o número de livros encontrados com o padrão especificado
 }
 
-// Função para remover o título de um livro na fila
-int removerLivro(char titulo[], struct Livro **fila) {
-    struct Livro *atual = *fila;
-    struct Livro *anterior = NULL;
-
-    // Percorre a fila até encontrar o livro ou chegar ao final
-    while (atual != NULL) {
-        // Verifica se o livro atual é o que deseja remover
-        if (strcmp(atual->titulo, titulo) == 0) {
-            // Se o livro a ser removido estiver no início da fila
-            if (anterior == NULL) {
-                *fila = atual->prox; // Atualiza o início da fila
-            } else {
-                anterior->prox = atual->prox; // Atualiza o ponteiro do livro anterior para apontar para o próximo livro
-            }
-            free(atual); // Libera a memória do livro removido
-            printf("O livro '%s' foi removido.\n", titulo);
-            return 1; // Retorna 1 se o livro for encontrado e removido
-        }
-        anterior = atual;
-        atual = atual->prox;
+// Função para desempilhar o título de um livro na pilha
+int desempilharLivro(struct Livro **pilha) {
+    if (*pilha == NULL) {
+        printf("A pilha está vazia. Nenhum livro para remover.\n");
+        return 0;
     }
 
-    // Se o livro não for encontrado, exibe uma mensagem
-    printf("O livro '%s' não foi encontrado.\n", titulo);
-    return 0;
+    struct Livro *temp = *pilha;
+    *pilha = temp->prox; // Atualiza o topo da pilha para o próximo livro
+    free(temp); // Libera a memória do livro removido
+
+    printf("O livro foi removido da pilha.\n");
+    return 1;
 }
 
-// Função para alterar o título de um livro na fila
-int alterarLivro(char tituloAntigo[], char novoTitulo[], struct Livro *fila) {
-    struct Livro *temp = fila;
+// Função para alterar o título de um livro na pilha
+int alterarLivro(char tituloAntigo[], char novoTitulo[], struct Livro *pilha) {
+    struct Livro *temp = pilha;
 
-    // Percorre a fila até encontrar o livro ou chegar ao final
+    // Percorre a pilha até encontrar o livro ou chegar ao final
     while (temp != NULL) {
         if (strcmp(temp->titulo, tituloAntigo) == 0) {
             strcpy(temp->titulo, novoTitulo); // Altera o título do livro
@@ -154,23 +156,23 @@ int alterarLivro(char tituloAntigo[], char novoTitulo[], struct Livro *fila) {
     return 0;
 }
 
-// Função para localizar um livro na fila
-int localizarLivro(char titulo[], struct Livro *fila) {
-    struct Livro *temp = fila;
-    int posicao = 1; // Inicia a posição do livro na fila como 1
+// Função para localizar um livro na pilha
+int localizarLivro(char titulo[], struct Livro *pilha) {
+    struct Livro *temp = pilha;
+    int posicao = 1; // Inicia a posição do livro na pilha como 1
     char novoTitulo[100];
 
-    // Percorre a fila até encontrar o livro ou chegar ao final
+    // Percorre a pilha até encontrar o livro ou chegar ao final
     while (temp != NULL) {
         if (strcmp(temp->titulo, titulo) == 0) {
-            printf("O livro '%s' foi encontrado na posição %d da fila. \n", titulo, posicao);
+            printf("O livro '%s' foi encontrado na posição %d da pilha. \n", titulo, posicao);
             printf("Deseja alterar o título deste livro? (s/n): ");
             char resposta;
             scanf(" %c", &resposta);
             if (resposta == 's' || resposta == 'S') {
                 printf("Digite o novo título: ");
                 scanf(" %[^\n]", novoTitulo); // Lê o novo título do livro (pode conter espaços)
-                alterarLivro(titulo, novoTitulo, fila);
+                alterarLivro(titulo, novoTitulo, pilha);
             }
             return 1; // Retorna 1 se o livro for encontrado
         }
@@ -179,47 +181,47 @@ int localizarLivro(char titulo[], struct Livro *fila) {
     }
 
     // Se o livro não for encontrado, exibe uma mensagem
-    printf("O livro '%s' não foi encontrado na fila.\n", titulo);
+    printf("O livro '%s' não foi encontrado na pilha.\n", titulo);
     return 0;
 }
 
-// Função para destruir a fila de livros
-int destruirFila(struct Livro **fila) {
-    struct Livro *atual = *fila; // Ponteiro auxiliar que aponta para o início da fila
+// Função para destruir a pilha de livros
+int destruirPilha(struct Livro **pilha) {
+    struct Livro *atual = *pilha; // Ponteiro auxiliar que aponta para o topo da pilha
     struct Livro *proximo;
     
-    // Loop de destruição da fila
+    // Loop de destruição da pilha
     while (atual != NULL) {
         proximo = atual->prox; // Salva o próximo livro em 'proximo' antes de remover o livro atual
         free(atual); // Libera a memória do livro atual
         atual = proximo; // Atualiza o ponteiro atual para o próximo livro
     }
-    *fila = NULL; // Define o ponteiro inicial da fila como NULL
+    *pilha = NULL; // Define o topo da pilha como NULL
 
-    printf("A fila foi destruída.\n");
+    printf("A pilha foi destruída.\n");
 
     return 0;
 }
 
-// Função para intercalar duas filas
-struct Livro* intercalarFilas(struct Livro* fila1, struct Livro* fila2) {
-    struct Livro* resultado = NULL;
-    struct Livro* temp1 = fila1;
-    struct Livro* temp2 = fila2;
+// Função para intercalar duas pilhas
+struct Livro* intercalarPilhas(struct Livro* pilha1, struct Livro* pilha2) {
+    struct Livro* resultado = NULL; // Inicializa a pilha de resultado
+    struct Livro* temp1 = pilha1;
+    struct Livro* temp2 = pilha2;
 
     while (temp1 != NULL || temp2 != NULL) {
         if (temp1 != NULL) {
-            struct Livro* novoLivro = (struct Livro*)malloc(sizeof(struct Livro));
-            strcpy(novoLivro->titulo, temp1->titulo);
-            novoLivro->prox = resultado;
-            resultado = novoLivro;
+            struct Livro* novoLivro1 = (struct Livro*)malloc(sizeof(struct Livro));
+            strcpy(novoLivro1->titulo, temp1->titulo);
+            novoLivro1->prox = resultado;
+            resultado = novoLivro1;
             temp1 = temp1->prox;
         }
         if (temp2 != NULL) {
-            struct Livro* novoLivro = (struct Livro*)malloc(sizeof(struct Livro));
-            strcpy(novoLivro->titulo, temp2->titulo);
-            novoLivro->prox = resultado;
-            resultado = novoLivro;
+            struct Livro* novoLivro2 = (struct Livro*)malloc(sizeof(struct Livro));
+            strcpy(novoLivro2->titulo, temp2->titulo);
+            novoLivro2->prox = resultado;
+            resultado = novoLivro2;
             temp2 = temp2->prox;
         }
     }
@@ -227,22 +229,64 @@ struct Livro* intercalarFilas(struct Livro* fila1, struct Livro* fila2) {
     return resultado;
 }
 
-// Função para concatenar duas filas
-void concatenarFilas(struct Livro** fila1, struct Livro* fila2) {
-    if (*fila1 == NULL) {
-        *fila1 = fila2;
+// Função para concatenar duas pilhas
+void concatenarPilhas(struct Livro** pilha1, struct Livro* pilha2) {
+    if (*pilha1 == NULL) {
+        *pilha1 = pilha2;
     } else {
-        struct Livro* temp = *fila1;
+        struct Livro* temp = *pilha1;
         while (temp->prox != NULL) {
             temp = temp->prox;
         }
-        temp->prox = fila2;
+        temp->prox = pilha2;
     }
 }
 
-// Função para fazer uma cópia da fila
-struct Livro* copiarFila(struct Livro* original) {
-    struct Livro* copia = NULL;
+// Função para dividir uma pilha em duas
+void dividirPilha(struct Livro* original, struct Livro** metade1, struct Livro** metade2) {
+    *metade1 = NULL; // Inicializa as metades como NULL
+    *metade2 = NULL;
+
+    struct Livro* temp = original;
+    int size = 0;
+
+    // Conta o tamanho da pilha
+    while (temp != NULL) {
+        size++;
+        temp = temp->prox;
+    }
+
+    // Calcula o tamanho de cada metade
+    int half_size = size / 2;
+
+    // Reinicializa o ponteiro temporário para o início da pilha
+    temp = original;
+
+    // Percorre a pilha original até o ponto médio
+    for (int i = 0; i < half_size; i++) {
+        struct Livro* novoLivro = (struct Livro*)malloc(sizeof(struct Livro));
+        strcpy(novoLivro->titulo, temp->titulo);
+        novoLivro->prox = NULL;
+
+        if (*metade1 == NULL) {
+            *metade1 = novoLivro;
+        } else {
+            struct Livro* temp1 = *metade1;
+            while (temp1->prox != NULL) {
+                temp1 = temp1->prox;
+            }
+            temp1->prox = novoLivro;
+        }
+        temp = temp->prox;
+    }
+
+    // Atribui a segunda metade ao segundo ponteiro
+    *metade2 = temp;
+}
+
+// Função para fazer uma cópia da pilha
+struct Livro* copiarPilha(struct Livro* original) {
+    struct Livro* copia = NULL; // Inicializa a cópia como NULL
     struct Livro* temp = original;
     struct Livro* temp_copia = NULL; // Ponteiro para percorrer a cópia
 
@@ -264,68 +308,28 @@ struct Livro* copiarFila(struct Livro* original) {
 
     return copia;
 }
-
-// Função para dividir uma fila em duas
-void dividirFila(struct Livro* original, struct Livro** metade1, struct Livro** metade2) {
-    struct Livro* temp = original;
-    int size = 0;
-    
-    // Conta o tamanho da fila
-    while (temp != NULL) {
-        size++;
-        temp = temp->prox;
-    }
-    
-    // Calcula o tamanho de cada metade
-    int half_size = size / 2;
-    
-    // Reinicializa o ponteiro temporário para o início da fila
-    temp = original;
-
-    // Percorre a fila original até o ponto médio
-    for (int i = 0; i < half_size; i++) {
-        struct Livro* novoLivro = (struct Livro*)malloc(sizeof(struct Livro));
-        strcpy(novoLivro->titulo, temp->titulo);
-        novoLivro->prox = NULL;
-
-        if (*metade1 == NULL) {
-            *metade1 = novoLivro;
-        } else {
-            struct Livro* temp1 = *metade1;
-            while (temp1->prox != NULL) {
-                temp1 = temp1->prox;
-            }
-            temp1->prox = novoLivro;
-        }
-        temp = temp->prox;
-    }
-    
-    // Atribui a segunda metade ao segundo ponteiro
-    *metade2 = temp;
-}
-
-// Função para adicionar um novo livro na segunda fila
-void inserirLivroFila2(char titulo[]) {
+// Função para adicionar um novo livro na segunda pilha
+void inserirLivroPilha2(char titulo[]) {
     struct Livro *novo_livro = (struct Livro *)malloc(sizeof(struct Livro));
     strcpy(novo_livro->titulo, titulo); // Copia o título do livro
-    novo_livro->prox = NULL; // O próximo será NULL, pois está sendo inserido no final da fila
+    novo_livro->prox = NULL; // O próximo será NULL, pois está sendo inserido no final da pilha
 
-    // Se a fila2 estiver vazia, o novo livro será o primeiro
-    if (fila2 == NULL) {
-        fila2 = novo_livro;
+    // Se a pilha2 estiver vazia, o novo livro será o primeiro
+    if (pilha2 == NULL) {
+        pilha2 = novo_livro;
     } else {
-        // Encontra o último livro na fila2
-        struct Livro *temp = fila2;
+        // Encontra o último livro na pilha2
+        struct Livro *temp = pilha2;
         while (temp->prox != NULL) {
             temp = temp->prox;
         }
-        // Adiciona o novo livro no final da fila2
+        // Adiciona o novo livro no final da pilha2
         temp->prox = novo_livro;
     }
 }
 
-// Função para adicionar livros na segunda fila
-int inserirLivrosFila2() {
+// Função para adicionar livros na segunda pilha
+int inserirLivrosPilha2() {
     char titulo[100];
     char continuar;
     int count = 0; // Contador para acompanhar o número de livros adicionados
@@ -334,22 +338,22 @@ int inserirLivrosFila2() {
     do {
         // Verifica se atingiu o limite máximo de livros
         if (count == MAX_LIVROS) {
-            printf("A segunda fila atingiu o limite máximo de livros.\n");
+            printf("A segunda pilha atingiu o limite máximo de livros.\n");
             break;
         }
 
-        printf("Digite o titulo do livro para a segunda fila: ");
+        printf("Digite o titulo do livro para a segunda pilha: ");
         scanf(" %[^\n]", titulo); // Lê o título do livro (pode conter espaços)
-        inserirLivroFila2(titulo);
+        inserirLivroPilha2(titulo);
         count++; // Incrementa o contador de livros adicionados
 
         // Se atingiu o limite máximo de livros, sai do loop
         if (count == MAX_LIVROS) {
-            printf("A segunda fila atingiu o limite máximo de livros.\n");
+            printf("A segunda pilha atingiu o limite máximo de livros.\n");
             break;
         }
 
-        printf("Deseja adicionar outro livro na segunda fila? (s/n): ");
+        printf("Deseja adicionar outro livro na segunda pilha? (s/n): ");
         scanf(" %c", &continuar);
     } while (continuar == 's' || continuar == 'S');
 
@@ -360,7 +364,7 @@ int inserirLivrosFila2() {
 int menu() {
     int opcao;
 
-    while (1) { // Loop para exibir o menu repetidamente
+    do { // Loop para exibir o menu repetidamente até que o usuário escolha sair
         printf("\nDigite 1 para adicionar livros na biblioteca\n");
         printf("Digite 2 para destruir a biblioteca\n");
         printf("Digite 3 para imprimir os livros da biblioteca\n");
@@ -368,12 +372,14 @@ int menu() {
         printf("Digite 5 para alterar o titulo de um livro na biblioteca\n");
         printf("Digite 6 para buscar por padrao\n");
         printf("Digite 7 para remover um livro da biblioteca\n");
-        printf("Digite 8 para intercalar duas filas\n");
-        printf("Digite 9 para concatenar duas filas\n");
-        printf("Digite 10 para dividir uma fila em duas\n");
-        printf("Digite 11 para fazer uma copia da fila\n");
-        printf("Digite 12 para adicionar livros na segunda fila\n");
-        printf("Digite 13 para sair\n");
+        printf("Digite 8 para intercalar duas pilhas\n");
+        printf("Digite 9 para concatenar duas pilhas\n");
+        printf("Digite 10 para dividir uma pilha em duas\n");
+        printf("Digite 11 para fazer uma copia da pilha\n");
+        printf("Digite 12 para adicionar livros na segunda pilha\n");
+        printf("Digite 13 para verificar se a pilha está cheia\n");
+        printf("Digite 14 para verificar se a pilha está vazia\n");
+        printf("Digite 15 para sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
@@ -382,10 +388,10 @@ int menu() {
                 inserirLivros(&biblioteca);
                 break;
             case 2: 
-                destruirFila(&biblioteca);
+                destruirPilha(&biblioteca); // Corrigido o nome da função
                 break;
             case 3: 
-                imprimeFila(biblioteca);
+                imprimePilha(biblioteca); // Corrigido o nome da função
                 break;
             case 4: {
                 char titulo[100];
@@ -414,55 +420,66 @@ int menu() {
                 char titulo[100];
                 printf("Digite o titulo do livro que deseja remover: ");
                 scanf(" %[^\n]", titulo); // Lê o título do livro (pode conter espaços)
-                removerLivro(titulo, &biblioteca);
+                desempilharLivro(&biblioteca); // Corrigido o nome da função
                 break;
             }
             case 8: {
-                printf("Intercalando as duas filas...\n");
-                struct Livro* resultado = intercalarFilas(fila1, fila2);
-                imprimeFila(resultado);
-                destruirFila(&resultado); // Libera a memória alocada para a fila resultante
+                printf("Intercalando as duas pilhas...\n");
+                struct Livro* resultado = intercalarPilhas(pilha1, pilha2);
+                imprimePilha(resultado); // Corrigido o nome da função
+                destruirPilha(&resultado); // Corrigido o nome da função e liberada a memória alocada para a pilha resultante
                 break;
             }
             case 9: {
-                printf("Concatenando as duas filas...\n");
-                concatenarFilas(&fila1, fila2);
-                imprimeFila(fila1);
+                printf("Concatenando as duas pilhas...\n");
+                concatenarPilhas(&pilha1, pilha2);
+                imprimePilha(pilha1); // Corrigido o nome da função
                 break;
             }
             case 10: {
+                printf("Dividindo a pilha...\n");
                 struct Livro* metade1 = NULL;
                 struct Livro* metade2 = NULL;
-                dividirFila(biblioteca, &metade1, &metade2);
-                printf("Primeira metade:\n");
-                imprimeFila(metade1);
-                printf("Segunda metade:\n");
-                imprimeFila(metade2);
-                destruirFila(&metade1); // Libera a memória alocada para a primeira metade
+                dividirPilha(biblioteca, &metade1, &metade2); // Corrigido o nome da função
+                printf("Metade 1:\n");
+                imprimePilha(metade1);
+                printf("Metade 2:\n");
+                imprimePilha(metade2);
+                destruirPilha(&metade1); // Corrigido o nome da função e liberada a memória alocada para a primeira metade
+                destruirPilha(&metade2); // Corrigido o nome da função e liberada a memória alocada para a segunda metade
                 break;
             }
             case 11: {
-                struct Livro* copia = copiarFila(biblioteca);
-                printf("Copia da fila:\n");
-                imprimeFila(copia);
-                destruirFila(&copia); // Libera a memória alocada para a cópia
+                printf("Copiando a pilha...\n");
+                struct Livro* copia = copiarPilha(biblioteca); // Corrigido o nome da função
+                imprimePilha(copia);
+                destruirPilha(&copia); // Corrigido o nome da função e liberada a memória alocada para a cópia
                 break;
             }
-            case 12: 
-                inserirLivrosFila2();
+            case 12:
+                inserirLivrosPilha2(); // Adiciona livros na segunda pilha
                 break;
             case 13:
-                printf("Saindo...\n");
-                return 0;
-            default:
-                printf("Opcao invalida. Tente novamente.\n");
+                pilhaEstaCheia(biblioteca); // Verifica se a pilha está cheia
+                break;
+            case 14:
+                pilhaEstaVazia(biblioteca); // Verifica se a pilha está vazia
+                break;
+            case 15: // Caso o usuário escolha sair
+                printf("Encerrando o programa...\n");
+                break;
+            default: // Se o usuário digitar uma opção inválida
+                printf("Opcao invalida. Digite novamente.\n");
                 break;
         }
-    }
+    } while (opcao != 15); // O loop continua até que o usuário escolha sair
+
+    return 0;
 }
 
-// Função principal
+
 int main() {
-    menu(); // Chama a função do menu
+    printf("Bem-vindo ao sistema de biblioteca!\n");
+    menu(); // Chama a função do menu principal
     return 0;
 }
