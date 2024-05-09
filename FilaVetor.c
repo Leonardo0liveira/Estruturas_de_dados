@@ -2,291 +2,313 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ELEMENTOS 5 // Defina o tamanho máximo do vetor
+#define MAX_ELEMENTOS 100 /** Tamanho máximo do vetor **/
 
-// Define a estrutura Fila
-struct Fila {
-    char elementos[MAX_ELEMENTOS][100]; // Vetor para armazenar os elementos
-    int frente, tras; // Índices da frente e do final da fila
+/** Estrutura Pilha **/
+struct Pilha {
+    char elementos[MAX_ELEMENTOS][100]; /** Vetor para armazenar todos os elementos **/
+    int topo; /** Topo da pilha **/
 };
 
-// Função para criar uma nova fila
-struct Fila criarFila() {
-    struct Fila fila;
-    fila.frente = -1; // Inicializa a frente como -1
-    fila.tras = -1; // Inicializa o final como -1
-    return fila;
+/** Função para criar uma nova pilha **/
+struct Pilha criarPilha() {
+    struct Pilha pilha;
+    pilha.topo = -1; /** Inicializa o topo como -1 (pilha vazia) **/
+
+    return pilha;
 }
 
-// Função para verificar se a fila está vazia
-int filaVazia(struct Fila fila) {
-    return fila.frente == -1; // Retorna 1 se a frente for -1 (fila vazia)
+/** Função para verificar se a pilha está vazia **/
+int pilhaVazia(struct Pilha pilha) {
+    return pilha.topo == -1; /** Retorna 1 se o topo for igual a -1 **/
 }
 
-// Função para verificar se a fila está cheia
-int filaCheia(struct Fila fila) {
-    return fila.tras == MAX_ELEMENTOS - 1; // Retorna 1 se o final for igual ao tamanho máximo - 1
+/** Função para verificar se a pilha está cheia **/
+int pilhaCheia(struct Pilha pilha) {
+    return pilha.topo == MAX_ELEMENTOS - 1; /** Retorna 1 se o topo for igual ao tamanho máximo - 1 **/
 }
 
-// Função para inserir um elemento na fila
-void inserirElemento(struct Fila *fila, char elemento[]) {
-    if (!filaCheia(*fila)) {
-        if (filaVazia(*fila)) {
-            fila->frente = 0; // Se a fila estiver vazia, define a frente como 0
-        }
-        fila->tras++; // Atualiza o final
-        strcpy(fila->elementos[fila->tras], elemento); // Insere o elemento no final
-        printf("Elemento '%s' inserido na fila.\n", elemento);
+/** Função para adicionar um livro à pilha **/
+void adicionarLivro(struct Pilha *pilha, char livro[]) {
+    if (!pilhaCheia(*pilha)) {
+        pilha->topo++; /** Incrementa o topo **/
+        strcpy(pilha->elementos[pilha->topo], livro); /** Adiciona o livro no topo **/
+        printf("Livro '%s' adicionado à biblioteca.\n", livro);
     } else {
-        printf("A fila está cheia. Elemento '%s' não foi inserido.\n", elemento);
+        printf("A biblioteca está cheia. Livro '%s' não foi adicionado.\n", livro);
     }
 }
 
-// Função para remover um elemento da fila
-void removerElemento(struct Fila *fila) {
-    if (!filaVazia(*fila)) {
-        printf("Elemento '%s' removido da fila.\n", fila->elementos[fila->frente]); // Remove o elemento da frente
-        if (fila->frente == fila->tras) {
-            fila->frente = fila->tras = -1; // Se a fila tinha apenas um elemento, define frente e final como -1
-        } else {
-            fila->frente++; // Atualiza a frente
+/** Função para destruir a biblioteca (limpar a pilha) **/
+void destruirBiblioteca(struct Pilha *pilha) {
+    pilha->topo = -1; /** Define o topo como -1 (pilha vazia) **/
+    printf("Biblioteca destruída. Todos os livros foram removidos.\n");
+}
+
+/** Função para imprimir os livros da biblioteca **/
+void imprimirLivros(struct Pilha pilha) {
+    int i; /** Declaração da variável de iteração **/
+    if (!pilhaVazia(pilha)) {
+        printf("\nLivros na biblioteca:\n");
+        for (i = pilha.topo; i >= 0; i--) {
+            printf("%s\n", pilha.elementos[i]);
         }
     } else {
-        printf("A fila está vazia. Nenhum elemento para remover.\n");
+        printf("A biblioteca está vazia. Nenhum livro para imprimir.\n");
     }
 }
 
-// Função para exibir os elementos da fila
-void exibirElementos(struct Fila fila) {
-    if (!filaVazia(fila)) {
-        printf("\nElementos na fila:\n");
-        for (int i = fila.frente; i <= fila.tras; i++) {
-            printf("%s\n", fila.elementos[i]);
-        }
-    } else {
-        printf("A fila está vazia. Nenhum elemento para exibir.\n");
-    }
-}
-
-// Função para localizar um elemento na fila para consulta
-void localizarElementoConsulta(struct Fila fila, char elemento[]) {
-    if (!filaVazia(fila)) {
-        for (int i = fila.frente; i <= fila.tras; i++) {
-            if (strcmp(fila.elementos[i], elemento) == 0) {
-                printf("O elemento '%s' foi encontrado na fila na posição %d.\n", elemento, i + 1);
+/** Função para localizar um livro na biblioteca para consulta **/
+void localizarLivro(struct Pilha pilha, char livro[]) {
+    int i; /** Declaração da variável de iteração **/
+    if (!pilhaVazia(pilha)) {
+        for (i = pilha.topo; i >= 0; i--) {
+            if (strcmp(pilha.elementos[i], livro) == 0) {
+                printf("O livro '%s' foi encontrado na biblioteca no topo da pilha.\n", livro);
                 return;
             }
         }
-        printf("O elemento '%s' não foi encontrado na fila.\n", elemento);
+        printf("O livro '%s' não foi encontrado na biblioteca.\n", livro);
     } else {
-        printf("A fila está vazia. Nenhum elemento para consultar.\n");
+        printf("A biblioteca está vazia. Nenhum livro para consultar.\n");
     }
 }
 
-// Função para localizar um elemento na fila para alteração da informação
-void localizarElementoAlteracao(struct Fila *fila, char elemento[]) {
-    if (!filaVazia(*fila)) {
-        for (int i = fila->frente; i <= fila->tras; i++) {
-            if (strcmp(fila->elementos[i], elemento) == 0) {
-                printf("Digite o novo valor para o elemento '%s': ", elemento);
-                scanf(" %[^\n]", fila->elementos[i]); // Lê o novo valor para o elemento
-                printf("O elemento '%s' foi alterado para '%s'.\n", elemento, fila->elementos[i]);
+/** Função para alterar o título de um livro na biblioteca **/
+void alterarTituloLivro(struct Pilha *pilha, char livro[]) {
+    int i; /** Declaração da variável de iteração **/
+    if (!pilhaVazia(*pilha)) {
+        for (i = pilha->topo; i >= 0; i--) {
+            if (strcmp(pilha->elementos[i], livro) == 0) {
+                printf("Digite o novo título para o livro '%s': ", livro);
+                scanf(" %[^\n]", pilha->elementos[i]); /** Lê o novo título para o livro **/
+                printf("O título do livro '%s' foi alterado para '%s'.\n", livro, pilha->elementos[i]);
                 return;
             }
         }
-        printf("O elemento '%s' não foi encontrado na fila. Nenhuma alteração feita.\n", elemento);
+        printf("O livro '%s' não foi encontrado na biblioteca. Nenhuma alteração feita.\n", livro);
     } else {
-        printf("A fila está vazia. Nenhum elemento para alterar.\n");
+        printf("A biblioteca está vazia. Nenhum livro para alterar.\n");
     }
 }
 
-// Função para buscar por elementos que coincidam com um certo padrão na fila
-void buscarPorPadrao(struct Fila fila, char padrao[]) {
-    if (!filaVazia(fila)) {
-        printf("\nElementos na fila que coincidem com o padrão '%s':\n", padrao);
-        for (int i = fila.frente; i <= fila.tras; i++) {
-            if (strstr(fila.elementos[i], padrao) != NULL) {
-                printf("%s\n", fila.elementos[i]);
+/** Função para buscar por livros que coincidam com um certo padrão na biblioteca **/
+void buscarPorPadrao(struct Pilha pilha, char padrao[]) {
+    int i; /** Declaração da variável de iteração **/
+    if (!pilhaVazia(pilha)) {
+        printf("\nLivros na biblioteca que coincidem com o padrão '%s':\n", padrao);
+        for (i = pilha.topo; i >= 0; i--) {
+            if (strstr(pilha.elementos[i], padrao) != NULL) {
+                printf("%s\n", pilha.elementos[i]);
             }
         }
     } else {
-        printf("A fila está vazia. Nenhum elemento para buscar por padrão.\n");
+        printf("A biblioteca está vazia. Nenhum livro para buscar por padrão.\n");
     }
 }
 
-// Função para intercalar duas filas
-void intercalarFilas(struct Fila fila1, struct Fila fila2) {
-    struct Fila resultado = criarFila();
-    int i = fila1.frente, j = fila2.frente;
-    while (i <= fila1.tras || j <= fila2.tras) {
-        if (i <= fila1.tras) {
-            inserirElemento(&resultado, fila1.elementos[i]);
-            i++;
-        }
-        if (j <= fila2.tras) {
-            inserirElemento(&resultado, fila2.elementos[j]);
-            j++;
-        }
-    }
-    printf("Filas intercaladas:\n");
-    exibirElementos(resultado);
-}
-
-// Função para concatenar duas filas
-void concatenarFilas(struct Fila *fila1, struct Fila fila2) {
-    if ((fila1->tras + 1) + (fila2.tras - fila2.frente + 1) <= MAX_ELEMENTOS) {
-        for (int i = fila2.frente; i <= fila2.tras; i++) {
-            inserirElemento(fila1, fila2.elementos[i]);
-        }
-        printf("Filas concatenadas:\n");
-        exibirElementos(*fila1);
+/** Função para remover um livro da biblioteca **/
+void removerLivro(struct Pilha *pilha) {
+    if (!pilhaVazia(*pilha)) {
+        printf("Livro '%s' removido da biblioteca.\n", pilha->elementos[pilha->topo]); /** Remove o livro do topo **/
+        pilha->topo--; /** Decrementa o topo **/
     } else {
-        printf("A fila de destino está cheia. Alguns elementos podem não ter sido concatenados.\n");
+        printf("A biblioteca está vazia. Nenhum livro para remover.\n");
     }
 }
 
-// Função para dividir uma fila em duas
-void dividirFila(struct Fila *fila, struct Fila *metade1, struct Fila *metade2) {
-    while (!filaVazia(*fila)) {
-        if (!filaCheia(*metade1)) {
-            inserirElemento(metade1, fila->elementos[fila->frente]);
-            removerElemento(fila);
-        } else if (!filaCheia(*metade2)) {
-            inserirElemento(metade2, fila->elementos[fila->frente]);
-            removerElemento(fila);
-        } else {
-            printf("As filas de destino estão cheias. Alguns elementos podem não ter sido divididos.\n");
-            return;
+/** Função para intercalar duas pilhas **/
+void intercalarPilhas(struct Pilha pilha1, struct Pilha pilha2) {
+    struct Pilha resultado = criarPilha();
+    while (!pilhaVazia(pilha1) || !pilhaVazia(pilha2)) {
+        if (!pilhaVazia(pilha1)) {
+            adicionarLivro(&resultado, pilha1.elementos[pilha1.topo]);
+            pilha1.topo--;
+        }
+        if (!pilhaVazia(pilha2)) {
+            adicionarLivro(&resultado, pilha2.elementos[pilha2.topo]);
+            pilha2.topo--;
         }
     }
-    printf("Fila dividida:\n");
-    printf("Metade 1:\n");
-    exibirElementos(*metade1);
-    printf("Metade 2:\n");
-    exibirElementos(*metade2);
+    printf("Pilhas intercaladas:\n");
+    imprimirLivros(resultado);
 }
 
-// Função para fazer uma cópia da fila
-void copiarFila(struct Fila fila, struct Fila *copia) {
-    while (!filaVazia(fila)) {
-        if (!filaCheia(*copia)) {
-            inserirElemento(copia, fila.elementos[fila.frente]);
-            removerElemento(&fila);
-        } else {
-            printf("A fila de cópia está cheia. Alguns elementos podem não ter sido copiados.\n");
-            return;
-        }
+/** Função para concatenar duas pilhas **/
+void concatenarPilhas(struct Pilha *pilha1, struct Pilha pilha2) {
+    while (!pilhaVazia(pilha2)) {
+        adicionarLivro(pilha1, pilha2.elementos[pilha2.topo]);
+        pilha2.topo--;
     }
-    printf("Cópia da fila:\n");
-    exibirElementos(*copia);
+    printf("Pilhas concatenadas:\n");
+    imprimirLivros(*pilha1);
 }
 
-// Função do menu principal
+/** Função para dividir uma pilha em duas **/
+void dividirPilha(struct Pilha *pilha) {
+    if (!pilhaVazia(*pilha)) {
+        int metade = pilha->topo / 2;
+        struct Pilha pilha2 = criarPilha(); /** Cria uma nova pilha **/
+        while (pilha->topo > metade) {
+            adicionarLivro(&pilha2, pilha->elementos[pilha->topo]);
+            pilha->topo--;
+        }
+        printf("Pilha dividida em duas:\n");
+        printf("Pilha 1:\n");
+        imprimirLivros(*pilha);
+        printf("Pilha 2:\n");
+        imprimirLivros(pilha2);
+    } else {
+        printf("A biblioteca está vazia. Nada para dividir.\n");
+    }
+}
+
+/** Função para fazer uma cópia da pilha **/
+struct Pilha copiarPilha(struct Pilha pilha) {
+    struct Pilha copia = criarPilha();
+    int i; /** Declaração da variável de iteração **/
+    for (i = pilha.topo; i >= 0; i--) {
+        adicionarLivro(&copia, pilha.elementos[i]);
+    }
+    return copia;
+}
+
+/* Função do menu principal */
 void menu() {
-    struct Fila fila1 = criarFila();
-    struct Fila fila2 = criarFila();
+    struct Pilha biblioteca = criarPilha();
     int opcao;
 
     while (1) {
-        printf("\nDigite 1 para inserir elemento na fila 1\n");
-        printf("Digite 2 para remover elemento da fila 1\n");
-        printf("Digite 3 para exibir elementos da fila 1\n");
-        printf("Digite 4 para localizar um elemento na fila 1 para consulta\n");
-        printf("Digite 5 para localizar um elemento na fila 1 para alteração\n");
-        printf("Digite 6 para buscar por padrão na fila 1\n");
-        printf("Digite 7 para criar uma nova fila\n");
-        printf("Digite 8 para verificar se a fila 1 está vazia\n");
-        printf("Digite 9 para verificar se a fila 1 está cheia\n");
-        printf("Digite 10 para intercalar fila 1 e fila 2\n");
-        printf("Digite 11 para concatenar fila 1 e fila 2\n");
-        printf("Digite 12 para dividir a fila 1 em duas\n");
-        printf("Digite 13 para fazer uma cópia da fila 1\n");
-        printf("Digite 14 para sair\n");
-        printf("Escolha uma opcao: ");
+        printf("\nDigite 1 para adicionar livros na biblioteca\n");
+        printf("Digite 2 para destruir a biblioteca\n");
+        printf("Digite 3 para imprimir os livros da biblioteca\n");
+        printf("Digite 4 para localizar um livro na biblioteca\n");
+        printf("Digite 5 para alterar o titulo de um livro na biblioteca\n");
+        printf("Digite 6 para buscar por padrao\n");
+        printf("Digite 7 para remover um livro da biblioteca\n");
+        printf("Digite 8 para intercalar duas pilhas\n");
+        printf("Digite 9 para concatenar duas pilhas\n");
+        printf("Digite 10 para dividir uma pilha em duas\n");
+        printf("Digite 11 para fazer uma copia da pilha\n");
+        printf("Digite 12 para adicionar livros na segunda pilha\n");
+        printf("Digite 13 para verificar se a pilha está cheia\n");
+        printf("Digite 14 para verificar se a pilha está vazia\n");
+        printf("Digite 15 para remover um livro da biblioteca\n");
+        printf("Digite 16 para sair\n");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
 
         switch (opcao) {
             case 1: {
-                char elemento[100];
-                printf("Digite o elemento a ser inserido na fila 1: ");
-                scanf(" %[^\n]", elemento);
-                inserirElemento(&fila1, elemento);
+                char livro[100];
+                printf("Digite o nome do livro a ser adicionado na biblioteca: ");
+                scanf(" %[^\n]", livro);
+                adicionarLivro(&biblioteca, livro);
                 break;
             }
             case 2:
-                removerElemento(&fila1);
+                destruirBiblioteca(&biblioteca);
                 break;
             case 3:
-                exibirElementos(fila1);
+                imprimirLivros(biblioteca);
                 break;
             case 4: {
-                char elemento[100];
-                printf("Digite o elemento que deseja localizar na fila 1: ");
-                scanf(" %[^\n]", elemento);
-                localizarElementoConsulta(fila1, elemento);
+                char livro[100];
+                printf("Digite o nome do livro que deseja localizar na biblioteca: ");
+                scanf(" %[^\n]", livro);
+                localizarLivro(biblioteca, livro);
                 break;
             }
             case 5: {
-                char elemento[100];
-                printf("Digite o elemento que deseja alterar na fila 1: ");
-                scanf(" %[^\n]", elemento);
-                localizarElementoAlteracao(&fila1, elemento);
+                char livro[100];
+                printf("Digite o nome do livro que deseja alterar na biblioteca: ");
+                scanf(" %[^\n]", livro);
+                alterarTituloLivro(&biblioteca, livro);
                 break;
             }
             case 6: {
                 char padrao[100];
-                printf("Digite o padrao a ser buscado na fila 1: ");
+                printf("Digite o padrão a ser buscado na biblioteca: ");
                 scanf(" %[^\n]", padrao);
-                buscarPorPadrao(fila1, padrao);
+                buscarPorPadrao(biblioteca, padrao);
                 break;
             }
             case 7:
-                fila1 = criarFila();
-                printf("Uma nova fila foi criada.\n");
+                removerLivro(&biblioteca);
                 break;
-            case 8:
-                if (filaVazia(fila1)) {
-                    printf("A fila 1 está vazia.\n");
-                } else {
-                    printf("A fila 1 não está vazia.\n");
-                }
+            case 8: {
+                struct Pilha segundaPilha = criarPilha();
+                printf("Digite os livros para a segunda pilha (digite 'fim' para parar):\n");
+                char livro[100];
+                do {
+                    printf("Livro: ");
+                    scanf(" %[^\n]", livro);
+                    if (strcmp(livro, "fim") != 0) {
+                        adicionarLivro(&segundaPilha, livro);
+                    }
+                } while (strcmp(livro, "fim") != 0);
+                intercalarPilhas(biblioteca, segundaPilha);
                 break;
-            case 9:
-                if (filaCheia(fila1)) {
-                    printf("A fila 1 está cheia.\n");
-                } else {
-                    printf("A fila 1 não está cheia.\n");
-                }
+            }
+            case 9: {
+                struct Pilha segundaPilha = criarPilha();
+                printf("Digite os livros para a segunda pilha (digite 'fim' para parar):\n");
+                char livro[100];
+                do {
+                    printf("Livro: ");
+                    scanf(" %[^\n]", livro);
+                    if (strcmp(livro, "fim") != 0) {
+                        adicionarLivro(&segundaPilha, livro);
+                    }
+                } while (strcmp(livro, "fim") != 0);
+                concatenarPilhas(&biblioteca, segundaPilha);
                 break;
+            }
             case 10:
-                intercalarFilas(fila1, fila2);
+                dividirPilha(&biblioteca);
                 break;
-            case 11:
-                concatenarFilas(&fila1, fila2);
+            case 11: {
+                struct Pilha copia = copiarPilha(biblioteca);
+                printf("Cópia da pilha criada:\n");
+                imprimirLivros(copia);
                 break;
+            }
             case 12: {
-                struct Fila metade1 = criarFila();
-                struct Fila metade2 = criarFila();
-                dividirFila(&fila1, &metade1, &metade2);
+                char livro[100];
+                printf("Digite o nome do livro a ser adicionado na segunda pilha: ");
+                scanf(" %[^\n]", livro);
+                adicionarLivro(&biblioteca, livro);
                 break;
             }
-            case 13: {
-                struct Fila copia = criarFila();
-                copiarFila(fila1, &copia);
+            case 13:
+                if (pilhaCheia(biblioteca)) {
+                    printf("A biblioteca está cheia.\n");
+                } else {
+                    printf("A biblioteca não está cheia.\n");
+                }
                 break;
-            }
             case 14:
+                if (pilhaVazia(biblioteca)) {
+                    printf("A biblioteca está vazia.\n");
+                } else {
+                    printf("A biblioteca não está vazia.\n");
+                }
+                break;
+            case 15:
+                removerLivro(&biblioteca);
+                break;
+            case 16:
                 printf("Saindo...\n");
                 return;
             default:
-                printf("Opcao invalida. Por favor, tente novamente.\n");
+                printf("Opção inválida. Por favor, tente novamente.\n");
         }
     }
 }
 
-// Função principal
+/* Função principal */
 int main() {
-    // Chamada da função do menu principal
+    /* Chamada da função do menu principal */
     menu();
 
     return 0;
