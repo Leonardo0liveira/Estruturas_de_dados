@@ -360,6 +360,46 @@ int inserirLivrosPilha2() {
     return 1;
 }
 
+// Função para remover um livro específico da pilha
+int removerLivro(struct Livro **pilha) {
+    if (*pilha == NULL) {
+        printf("A pilha está vazia. Nenhum livro para remover.\n");
+        return 0;
+    }
+
+    char titulo[100];
+    printf("Digite o título do livro que deseja remover: ");
+    scanf(" %[^\n]", titulo);
+
+    struct Livro *atual = *pilha;
+    struct Livro *anterior = NULL;
+
+    // Procura o livro na pilha
+    while (atual != NULL) {
+        if (strcmp(atual->titulo, titulo) == 0) {
+            // Se o livro for encontrado, remove-o da pilha
+            if (anterior == NULL) {
+                // Se o livro a ser removido for o primeiro da pilha
+                *pilha = atual->prox;
+            } else {
+                // Se o livro a ser removido estiver no meio ou no final da pilha
+                anterior->prox = atual->prox;
+            }
+            free(atual); // Libera a memória do livro removido
+            printf("O livro '%s' foi removido da pilha.\n", titulo);
+            return 1;
+        }
+        // Atualiza os ponteiros para continuar procurando
+        anterior = atual;
+        atual = atual->prox;
+    }
+
+    // Se o livro não for encontrado, exibe uma mensagem
+    printf("O livro '%s' não foi encontrado na pilha.\n", titulo);
+    return 0;
+}
+
+
 // Função do menu principal
 int menu() {
     int opcao;
@@ -379,7 +419,8 @@ int menu() {
         printf("Digite 12 para adicionar livros na segunda pilha\n");
         printf("Digite 13 para verificar se a pilha está cheia\n");
         printf("Digite 14 para verificar se a pilha está vazia\n");
-        printf("Digite 15 para sair\n");
+        printf("Digite 15para remover um livro da biblioteca\n");
+        printf("Digite 16 para sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
@@ -466,13 +507,16 @@ int menu() {
                 pilhaEstaVazia(biblioteca); // Verifica se a pilha está vazia
                 break;
             case 15: // Caso o usuário escolha sair
+                 removerLivro(&biblioteca);
+                break;               
+             case 16: 
                 printf("Encerrando o programa...\n");
                 break;
             default: // Se o usuário digitar uma opção inválida
                 printf("Opcao invalida. Digite novamente.\n");
                 break;
         }
-    } while (opcao != 15); // O loop continua até que o usuário escolha sair
+    } while (opcao != 16); // O loop continua até que o usuário escolha sair
 
     return 0;
 }
