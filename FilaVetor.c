@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ELEMENTOS 100 // Defina o tamanho máximo do vetor
+#define MAX_ELEMENTOS 5 // Defina o tamanho máximo do vetor
 
 // Define a estrutura Fila
 struct Fila {
