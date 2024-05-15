@@ -54,36 +54,6 @@ No* buscarLetra(No *raiz, char letra) {
     return NULL;
 }
 
-void removerNo(No **raiz, char letra) {
-    if (*raiz == NULL)
-        return;
-    
-    if ((*raiz)->letra == letra) {
-        No *temp = *raiz;
-        *raiz = (*raiz)->irmao;
-        free(temp);
-        return;
-    }
-    
-    No *pai = *raiz;
-    No *atual = (*raiz)->filho;
-    while (atual != NULL) {
-        if (atual->letra == letra) {
-            pai->filho = atual->irmao;
-            free(atual);
-            return;
-        }
-        pai = atual;
-        atual = atual->irmao;
-    }
-    
-    atual = (*raiz)->filho;
-    while (atual != NULL) {
-        removerNo(&atual, letra);
-        atual = atual->irmao;
-    }
-}
-
 void imprimirArvore(No *raiz, int nivel) {
     if (raiz == NULL)
         return;
@@ -110,33 +80,37 @@ void liberarArvore(No *raiz) {
 }
 
 int main() {
+    // Construindo a árvore inicial
     No *raiz = criarNo('A', 0);
     inserirFilho(raiz, 'B', 1);
     inserirFilho(raiz, 'C', 2);
     inserirFilho(raiz->filho, 'D', 3);
     inserirFilho(raiz->filho, 'E', 4);
     inserirFilho(raiz->filho->irmao, 'F', 5);
-
-    printf("Árvore:\n");
+    inserirFilho(raiz->filho->irmao, 'G', 6);
+    
+    // 1. Buscar o nó "E" e inserir o nó "I" como filho
+    No *noE = buscarLetra(raiz, 'E');
+    if (noE != NULL) {
+        inserirFilho(noE, 'I', 7);
+    } else {
+        printf("Erro: nó 'E' não encontrado.\n");
+    }
+    
+    // 2. Buscar o nó "G" e inserir o nó "J" como filho
+    No *noG = buscarLetra(raiz, 'G');
+    if (noG != NULL) {
+        inserirFilho(noG, 'J', 8);
+    } else {
+        printf("Erro: nó 'G' não encontrado.\n");
+    }
+    
+    // 3. Exibir a árvore atualizada
+    printf("Árvore atualizada:\n");
     imprimirArvore(raiz, 0);
-
-    printf("\nBusca:\n");
-    char letraBuscada = 'D';
-    No *resultadoBusca = buscarLetra(raiz, letraBuscada);
-    if (resultadoBusca != NULL)
-        printf("Letra %c encontrada no índice %d!\n", letraBuscada, resultadoBusca->indice);
-    else
-        printf("Letra %c não encontrada!\n", letraBuscada);
-
-    printf("\nRemoção:\n");
-    char letraRemover = 'E';
-    removerNo(&raiz, letraRemover);
-    printf("Letra %c removida!\n", letraRemover);
-
-    printf("\nÁrvore após remoção:\n");
-    imprimirArvore(raiz, 0);
-
+    
+    // Liberar memória
     liberarArvore(raiz);
-
+    
     return 0;
 }
